@@ -51,7 +51,7 @@ module.exports = function(app){
     app.post('/nilaiSiswa/add', verification.verification, json.addNilaiAkhirSiswa);
 
     app.post('/kuesioner', verification.verification, json.testKuesioner);
-    app.post('/kuesioner/show', verification.verification, json.getTestResults);
+    app.post('/kuesioner/show', json.getTestResults);
 
     app.post('/rombelSiswa/getAllSiswa', verification.verification, json.getSiswaTingkat);
     app.post('/rombelSiswa/getAverage', verification.verification, json.getAverageNilaiAkhir);

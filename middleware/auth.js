@@ -1,4 +1,4 @@
-var connection = require('../koneksi');
+var connectionRequest = require('../koneksi');
 var mysql = require('mysql');
 var md5 = require('md5');
 var response = require('../res');
@@ -16,10 +16,13 @@ exports.registration = function (req, res) {
 
     let query = "SELECT no_induk FROM users WHERE no_induk=?";
     let requests = [no_induk];
+    
+    let connection = connectionRequest();
 
     connection.query(query, requests, function (error, rows, fields) {
         if (error) {
             console.log(error);
+            connection.end();
         } else {
             if(rows.length === 0) {
                 query = "INSERT INTO users (no_induk, nama, email, password, gender, tipe_pengguna) VALUES (?,?,?,?,?,?)";
@@ -28,12 +31,15 @@ exports.registration = function (req, res) {
                 connection.query(query, requests, function (error, rows, fields) {
                     if (error) {
                         console.log(error);
+                        connection.end();
                     } else {
                         response.ok("Registrasi berhasil!", res);
+                        connection.end();
                     }
                 });
             } else {
                 response.ok("Nomor induk (NIS atau NIP) yang dimasukkan sudah terdaftar!", res);
+                connection.end();
             }
         }
     });
@@ -53,9 +59,12 @@ exports.registerStudent = function (req, res) {
     let query = "SELECT * FROM users WHERE no_induk=?";
     let requests = [no_induk];
 
+    let connection = connectionRequest();
+
     connection.query(query, requests, function (error, rows, fields) {
         if (error) {
             console.log(error);
+            connection.end();
         } else {
             if (rows.length === 1) {
                 let id_user = rows[0].id;
@@ -76,6 +85,7 @@ exports.registerStudent = function (req, res) {
                             connection.query(query, requests, function (error, rows, fields) {
                                 if (error) {
                                     console.log(error);
+                                    connection.end();
                                 } else {        
                                     query = "INSERT INTO siswa (id_users, tahun_masuk, status_awal_siswa, id_tingkat_siswa) VALUES (?,?,?,?)";
                                     requests = [id_user, tahun_masuk, status_awal_siswa, id_tingkat_kelas];
@@ -83,8 +93,10 @@ exports.registerStudent = function (req, res) {
                                     connection.query(query, requests, function (error, rows, fields) {
                                         if (error) {
                                             console.log(error);
+                                            connection.end();
                                         } else {
                                             response.ok("Registrasi berhasil!", res);
+                                            connection.end();
                                         }
                                     });
                                 }
@@ -98,6 +110,7 @@ exports.registerStudent = function (req, res) {
                     connection.query(query, requests, function (error, rows, fields) {
                         if (error) {
                             console.log(error);
+                            connection.end();
                         } else {        
                             query = "INSERT INTO siswa (id_users, tahun_masuk, status_awal_siswa, id_tingkat_siswa) VALUES (?,?,?,?)";
                             requests = [id_user, tahun_masuk, status_awal_siswa, id_tingkat_kelas];
@@ -105,8 +118,10 @@ exports.registerStudent = function (req, res) {
                             connection.query(query, requests, function (error, rows, fields) {
                                 if (error) {
                                     console.log(error);
+                                    connection.end();
                                 } else {
                                     response.ok("Registrasi berhasil!", res);
+                                    connection.end();
                                 }
                             });
                         }
@@ -117,6 +132,7 @@ exports.registerStudent = function (req, res) {
                     success: false,
                     message: "Data pengguna yang digunakan tidak ditemukan!"
                 });
+                connection.end();
             }
         }
     });
@@ -133,10 +149,13 @@ exports.registerTeacher = function (req, res) {
 
     let query = "SELECT * FROM users WHERE no_induk=?";
     let requests = [no_induk];
+    
+    let connection = connectionRequest();
 
     connection.query(query, requests, function (error, rows, fields) {
         if (error) {
             console.log(error);
+            connection.end();
         } else {
             if (rows.length === 1) {
                 let id_users = rows[0].id;
@@ -157,6 +176,7 @@ exports.registerTeacher = function (req, res) {
                             connection.query(query, requests, function (error, rows, fields) {
                                 if (error) {
                                     console.log(error);
+                                    connection.end();
                                 } else {        
                                     query = "INSERT INTO guru (id_users, id_mapel, status_ikatan_kerja) VALUES (?,?,?)";
                                     requests = [id_users, id_mapel, status_kerja];
@@ -164,8 +184,10 @@ exports.registerTeacher = function (req, res) {
                                     connection.query(query, requests, function (error, rows, fields) {
                                         if (error) {
                                             console.log(error);
+                                            connection.end();
                                         } else {
                                             response.ok("Registrasi berhasil!", res);
+                                            connection.end();
                                         }
                                     });
                                 }
@@ -179,6 +201,7 @@ exports.registerTeacher = function (req, res) {
                     connection.query(query, requests, function (error, rows, fields) {
                         if (error) {
                             console.log(error);
+                            connection.end();
                         } else {        
                             query = "INSERT INTO guru (id_users, id_mapel, status_ikatan_kerja) VALUES (?,?,?)";
                             requests = [id_users, id_mapel, status_kerja];
@@ -186,8 +209,10 @@ exports.registerTeacher = function (req, res) {
                             connection.query(query, requests, function (error, rows, fields) {
                                 if (error) {
                                     console.log(error);
+                                    connection.end();
                                 } else {
                                     response.ok("Registrasi berhasil!", res);
+                                    connection.end();
                                 }
                             });
                         }
@@ -198,6 +223,7 @@ exports.registerTeacher = function (req, res) {
                     success: false,
                     message: "Data pengguna yang digunakan tidak ditemukan!"
                 });
+                connection.end();
             }
         }
     });
@@ -210,10 +236,12 @@ exports.login = function (req, res) {
 
     let query = "SELECT * FROM users WHERE no_induk=? AND password=?";
     let requests = [no_induk, password];
+    let connection = connectionRequest();
 
     connection.query(query, requests, async function (error, rows, fields) {
         if (error) {
             console.log(error);
+            connection.end();
         } else {
             if(rows.length === 1) {
                 let access_token = resource.getToken(rows);
@@ -300,12 +328,14 @@ exports.login = function (req, res) {
                     message: "Login Sukses!",
                     user_data: userdata,
                 });
+                connection.end();
             } else {
                 res.json({
                     success: false,
                     message: "Email atau password salah!",
                     user_data: {}
                 });
+                connection.end();
             }
         }
     });
